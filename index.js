@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors')
 require('dotenv').config()
 app.use(cors())
@@ -23,9 +23,28 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    client.connect();
+    await client.connect();
+
+    const productsCollection = client.db('heroVerse').collection('products')
 
 
+    app.get('/products',async (req,res)=>{
+        const id = req.query.cateId
+        const query = {category_id: id}
+
+        if (req.query.cateId) {
+        const result = await productsCollection.find(query).toArray()
+        return res.send(result);
+        }
+        const result = await productsCollection.find().toArray()
+        return res.send(result);
+    })
+    app.get('/productsDetails/:id',async (req,res)=>{
+        const id = req.params.id
+        const query = {_id: new ObjectId(id)}
+        const result = await productsCollection.findOne(query)
+        res.send(result);
+    })
 
 
 
