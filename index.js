@@ -26,6 +26,7 @@ async function run() {
         await client.connect();
 
         const productsCollection = client.db('heroVerse').collection('products')
+        const topRatedCollection = client.db('heroVerse').collection('topRated')
 
         //its e indexing search
         const indexKey = { title: 1, category: 1 }
@@ -50,6 +51,14 @@ async function run() {
                 const result = await productsCollection.find(query).toArray()
                 return res.send(result);
             }
+
+            const page = parseInt(req.query.page)
+            const limit = parseInt(req.query.limit)
+            const skip = (page * limit)
+            if (req.query.page) {
+                const result = await productsCollection.find().skip(skip).limit(limit).toArray()
+                return res.send(result);
+            }
             
             const result = await productsCollection.find().toArray()
             return res.send(result);
@@ -58,7 +67,7 @@ async function run() {
         app.delete('/products/:id', async (req, res) => {
             const id = req.params.id
             console.log(id);
-            const query = { _id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await productsCollection.deleteOne(query)
             return res.send(result);
         })
@@ -86,7 +95,7 @@ async function run() {
             res.send(result);
         })
 
-        app.post('/products',async (req,res)=>{
+        app.post('/products', async (req, res) => {
 
 
             const newProduct = req.body
@@ -95,30 +104,67 @@ async function run() {
 
         })
 
-        app.put('/products/update/:id',async(req,res)=>{
+        app.put('/products/update/:id', async (req, res) => {
 
             const id = req.params.id;
             console.log(id);
             const updateProduct = req.body
-            console.log(updateProduct);
-            const query = {_id : new ObjectId(id)}
-            console.log(query);
-            const options = {upsert : true }
-
+            const query = { _id: new ObjectId(id) }
+            const options = { upsert: true }
             const updateSetFunc = {
-                $set : {
-                    
-                    name:updateProduct.name,
-                    picture:updateProduct.picture,
-                    sub_category:updateProduct.sub_category,
-                    price:updateProduct.price,
-                    rating:updateProduct.rating,
-                    quantity:updateProduct.quantity,
-                    description:updateProduct.description
+                $set: {
+
+                    name: updateProduct.name,
+                    picture: updateProduct.picture,
+                    sub_category: updateProduct.sub_category,
+                    price: updateProduct.price,
+                    rating: updateProduct.rating,
+                    quantity: updateProduct.quantity,
+                    description: updateProduct.description
                 }
             }
-            const result = await productsCollection.updateOne(query,updateSetFunc,options)
+            const result = await productsCollection.updateOne(query, updateSetFunc, options)
             res.send(result)
+
+        })
+
+
+        //top rated
+
+        app.get('/topRated', async (req, res) => {
+            const page = parseInt(req.query.page)
+            const limit = parseInt(req.query.limit)
+            const skip = (page * limit)
+            console.log(page, limit, skip);
+            const result = await topRatedCollection.find().skip(skip).limit(limit).toArray()
+            return res.send(result);
+
+
+        })
+
+        // app.get('/products/productPagination', async (req, res) => {
+        //     const page = parseInt(req.query.page)
+        //     const limit = parseInt(req.query.limit)
+        //     const skip = (page * limit)
+        //     console.log(page, limit, skip);
+        //     const result = await productsCollection.find().skip(skip).limit(limit).toArray()
+        //     return res.send(result);
+
+
+        // })
+
+        app.get('/topRatedCount', async (req, res) => {
+            
+            const totalRatedItem = await topRatedCollection.countDocuments()
+            return res.send({totalRatedItem});
+
+
+        })
+        app.get('/products/totalProducts', async (req, res) => {
+            
+            const totalRatedItem = await productsCollection.countDocuments()
+            return res.send({totalRatedItem});
+
 
         })
 
