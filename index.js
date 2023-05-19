@@ -59,7 +59,7 @@ async function run() {
                 const result = await productsCollection.find().skip(skip).limit(limit).toArray()
                 return res.send(result);
             }
-            
+
             const result = await productsCollection.find().toArray()
             return res.send(result);
         })
@@ -76,13 +76,15 @@ async function run() {
         app.get('/myAddedProducts', async (req, res) => {
             const email = req.query.email
             const query = { seller_email: email }
+            const sortValue = req.query.sortValue
+            console.log(sortValue);
 
             if (req.query.email) {
-                const result = await productsCollection.find(query).toArray()
+                const result = await productsCollection.find(query).sort({price: sortValue}).toArray()
                 return res.send(result);
             }
 
-            const result = await productsCollection.find().toArray()
+            const result = await productsCollection.find().sort({price: sortValue}).toArray()
             return res.send(result);
         })
 
