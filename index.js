@@ -27,6 +27,7 @@ async function run() {
 
         const productsCollection = client.db('heroVerse').collection('products')
         const topRatedCollection = client.db('heroVerse').collection('topRated')
+        const newArrivalsCollection = client.db('heroVerse').collection('newArrivals')
 
         //its e indexing search
         const indexKey = { title: 1, category: 1 }
@@ -168,6 +169,14 @@ async function run() {
             return res.send({totalRatedItem});
 
 
+        })
+
+        //newArrivals
+
+        app.get('/newArrivals', async (req, res) => {
+            
+            const result = await newArrivalsCollection.find().toArray()
+            return res.send(result);
         })
 
 
