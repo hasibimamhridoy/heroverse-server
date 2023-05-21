@@ -126,26 +126,26 @@ app.post('/products', async (req, res) => {
 
 })
 
-app.put('/products/update/:id', async (req, res) => {
+app.patch('/products/update/:id', async (req, res) => {
 
     const id = req.params.id;
     console.log(id);
     const updateProduct = req.body
     const query = { _id: new ObjectId(id) }
-    const options = { upsert: true }
+    // const options = { upsert: true }
     const updateSetFunc = {
         $set: {
 
-            name: updateProduct.name,
-            picture: updateProduct.picture,
-            sub_category: updateProduct.sub_category,
+            // name: updateProduct.name,
+            // picture: updateProduct.picture,
+            // sub_category: updateProduct.sub_category,
             price: updateProduct.price,
-            rating: updateProduct.rating,
+            // rating: updateProduct.rating,
             quantity: updateProduct.quantity,
             description: updateProduct.description
         }
     }
-    const result = await productsCollection.updateOne(query, updateSetFunc, options)
+    const result = await productsCollection.updateOne(query, updateSetFunc)
     res.send(result)
 
 })
